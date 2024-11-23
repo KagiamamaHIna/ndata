@@ -51,7 +51,7 @@ namespace ndata {
 	}
 
 	void wizard_pak(const std::string& WakPath, const std::string& path) {
-		wizard_get_pak(path).DumpWakForFile(WakPath);
+		wizard_get_pak(path).DumpWakToFile(WakPath);
 	}
 
 	void wizard_unpak(const std::string& WakPath, const std::string& path) {
