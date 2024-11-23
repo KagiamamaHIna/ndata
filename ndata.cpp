@@ -171,16 +171,12 @@ namespace ndata {
 		}
 		RWVecDWUint8(result, files, 4);
 		for (const auto& v : data) {//先构造这两个，但是PathData还需要进行一步处理
-			for (const auto& v : v.second) {//深拷贝数据
-				FileData.push_back(v);
-			}
+			FileData.insert(FileData.end(), v.second.begin(), v.second.end());//插入文件数据
 			FileData.push_back(0);//data的文件数据之间用一个0来分隔
 			PushDWUint8(PathData, 0);//先填充0，后续构造完成后再写入正确的文件指针数据
 			PushDWUint8(PathData, v.second.size());//填充文件大小
 			PushDWUint8(PathData, v.first.size());//路径文本大小
-			for (const uint8_t v : v.first) {//填充路径数据
-				PathData.push_back(v);
-			}
+			PathData.insert(PathData.end(), v.first.begin(), v.first.end());//插入路径数据
 		}
 		//因为现在PathData是不变动大小的了，所以可以写入路径块大小了
 		RWVecDWUint8(result, PathData.size() + 16, 8);

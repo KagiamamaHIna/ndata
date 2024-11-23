@@ -56,7 +56,7 @@ namespace ndata {
 		}
 	private:
 		static std::vector<uint8_t> ReadBinFile(const std::string& path);//读取二进制文件
-		std::unordered_map<std::string, std::vector<uint8_t>> data = std::unordered_map<std::string, std::vector<uint8_t>>();
+		std::unordered_map<std::string, std::vector<uint8_t>> data{};
 	};
 
 	class DataExceptionBase : public std::exception {
