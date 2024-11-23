@@ -22,7 +22,7 @@ namespace ndata {
 		virtual ~DataWak() = default;
 
 		std::vector<uint8_t> DumpWak() const;//将数据导出成Wak的形式
-		void DumpWakForFile(const std::string& path) const;//将数据导出到Wak文件里面
+		void DumpWakToFile(const std::string& path) const;//将数据导出到Wak文件里面
 		void DumpFiles(const std::string& path) const;//将数据以文件的形式导出到文件夹里面
 		std::vector<std::string> GetFileList() const;//获取所有文件路径
 

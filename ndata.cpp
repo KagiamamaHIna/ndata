@@ -199,7 +199,7 @@ namespace ndata {
 		return result;
 	}
 
-	void DataWak::DumpWakForFile(const std::string& path) const {
+	void DataWak::DumpWakToFile(const std::string& path) const {
 		WriteBinFile(path, DumpWak());
 	}
 
