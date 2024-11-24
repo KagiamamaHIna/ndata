@@ -9,6 +9,7 @@
 namespace ndata {
 	class DataWak;
 	std::string VecU8ToStr(const std::vector<uint8_t>&);//将给定的数据转换成std::string
+	std::vector<uint8_t> StrToVecU8(const std::string& str);//将给定的数据转换成std::vector<uint8_t> 
 	DataWak wizard_get_pak(const std::string& path);//指定一个路径，将路径下的文件全部打包成DataWak的形式并返回
 	void wizard_pak(const std::string& WakPath, const std::string& path);//指定一个路径，将路径下的文件全部打包成wak，带有data前缀
 	void wizard_unpak(const std::string& WakPath, const std::string& path);//指定一个wak路径，将wak解包至指定路径下
@@ -26,7 +27,7 @@ namespace ndata {
 		void DumpFiles(const std::string& path) const;//将数据以文件的形式导出到文件夹里面
 		std::vector<std::string> GetFileList() const;//获取所有文件路径
 
-		void AddFile(const std::string& key, std::vector<uint8_t> file) {//增加文件
+		void AddFile(const std::string& key, const std::vector<uint8_t>& file) {//增加文件
 			std::string NewKey = "data/" + key;
 			data[NewKey] = file;
 		}
@@ -54,8 +55,9 @@ namespace ndata {
 		std::unordered_map<std::string, std::vector<uint8_t>>& umap() {//访问原始哈希表
 			return data;
 		}
-	private:
+	protected:
 		static std::vector<uint8_t> ReadBinFile(const std::string& path);//读取二进制文件
+	private:
 		std::unordered_map<std::string, std::vector<uint8_t>> data{};
 	};
 

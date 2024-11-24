@@ -13,6 +13,10 @@ namespace ndata {
 		return std::string(data.begin(), data.end());
 	}
 
+	std::vector<uint8_t> StrToVecU8(const std::string& str) {
+		return std::vector<uint8_t>(str.begin(), str.end());
+	}
+
 	static std::vector<uint8_t> PAK__ReadBinFile(const std::string& path, bool& flag) {//读取二进制文件
 		std::ifstream inputFile(path, std::ios::binary | std::ios::out);
 		if (!inputFile.is_open()) {//未成功打开 
@@ -59,7 +63,7 @@ namespace ndata {
 	}
 
 	//都是小端序 这里都是工具函数
-	static void WriteBinFile(const std::string& path, const std::vector<uint8_t>& BinData) {//写入二进制文件
+	void WriteBinFile(const std::string& path, const std::vector<uint8_t>& BinData) {//写入二进制文件
 		std::ofstream outputFile(path, std::ios::binary | std::ios::trunc);
 		outputFile.write((const char*)BinData.data(), BinData.size());
 		outputFile.close();
@@ -72,23 +76,15 @@ namespace ndata {
 		WriteBinFile(path.c_str(), data);
 	}
 
-	static std::vector<uint8_t> DeepCopyU8(const std::vector<uint8_t>& srcData, size_t index, size_t size) {
-		std::vector<uint8_t> result;
-		for (size_t i = index; i < index + size; i++) {
-			result.push_back(srcData[i]);
-		}
-		return result;
+	std::vector<uint8_t> DeepCopyU8(const std::vector<uint8_t>& srcData, size_t index, size_t size) {
+		return std::vector<uint8_t>(srcData.begin() + index, srcData.begin() + index + size);
 	}
 
-	static std::string DeepCopyU8ToStr(const std::vector<uint8_t>& srcData, size_t index, size_t size) {
-		std::string result;
-		for (size_t i = index; i < index + size; i++) {
-			result.push_back(srcData[i]);
-		}
-		return result;
+	std::string DeepCopyU8ToStr(const std::vector<uint8_t>& srcData, size_t index, size_t size) {
+		return std::string(srcData.begin() + index, srcData.begin() + index + size);
 	}
 
-	static uint32_t GetU8VecDW(const std::vector<uint8_t>& srcData, size_t index) {
+	uint32_t GetU8VecDW(const std::vector<uint8_t>& srcData, size_t index) {
 		uint32_t result = 0;
 		result |= srcData[index + 3];
 		result <<= 8;
@@ -143,15 +139,14 @@ namespace ndata {
 		}
 		uint32_t Files = GetU8VecDW(dataWak, 4);//文件数，但是没什么用
 		uint32_t PathSize = GetU8VecDW(dataWak, 8);
-		std::vector<uint8_t> PathData = DeepCopyU8(dataWak, 16, PathSize - 16);//第一个四字节是位置关系，第二个四字节是大小关系，第三个四字节是文件目录字符串的长度
 
-		if (PathData.size() > dataSize) throw DataPathSizeOutOfBoundsException(16);
+		if (PathSize > dataSize) throw DataPathSizeOutOfBoundsException(16);
 
-		for (size_t i = 0; i + 12 < PathData.size(); i += 12) {
-			uint32_t FilePos = GetU8VecDW(PathData, i);
-			uint32_t FileSize = GetU8VecDW(PathData, i + 4);
-			uint32_t FilePathSize = GetU8VecDW(PathData, i + 8);
-			std::string path = DeepCopyU8ToStr(PathData, i + 12, FilePathSize);
+		for (size_t i = 16; i + 12 < PathSize; i += 12) {//第一个四字节是位置关系，第二个四字节是大小关系，第三个四字节是文件目录字符串的长度
+			uint32_t FilePos = GetU8VecDW(dataWak, i);
+			uint32_t FileSize = GetU8VecDW(dataWak, i + 4);
+			uint32_t FilePathSize = GetU8VecDW(dataWak, i + 8);
+			std::string path = DeepCopyU8ToStr(dataWak, i + 12, FilePathSize);
 			if (FilePos > dataSize) {
 				throw DataFileOutOfBoundsException(FilePos);
 			}
