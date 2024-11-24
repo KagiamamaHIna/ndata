@@ -8,6 +8,7 @@ namespace ndata {//要有自己的C++签名（
 }
 
 namespace ndata {
+	const uint8_t EADataWak::FileIv[16] = { 0xF2 ,0x3A ,0xD6 ,0x90 ,0xDA ,0xAC ,0xB7 ,0xE0 ,0x2B ,0x0C ,0xB5 ,0xBA ,0x83 ,0xB7 ,0x31 ,0xC4 };
 
 	uint32_t GetU8VecDW(const std::vector<uint8_t>& srcData, size_t index);
 	std::vector<uint8_t> DeepCopyU8(const std::vector<uint8_t>& srcData, size_t index, size_t size);
@@ -16,7 +17,7 @@ namespace ndata {
 	typedef uint8_t AvxKey[16];
 	typedef uint8_t AvxIv[16];
 
-	static void DecryptBlock(uint8_t* blockDatas, size_t size, AvxKey key, AvxIv iv) {
+	static void DecryptBlock(uint8_t* blockDatas, size_t size, const AvxKey key, const AvxIv iv) {
 		//初始化AES_ctx对象
 		AES_ctx ctx;
 		AES_init_ctx_iv(&ctx, key, iv);
@@ -66,15 +67,12 @@ namespace ndata {
 		}
 		AvxKey key;
 		AvxIv iv;
-		AvxIv FileIv;
 		GetIVForNum(0, key);
 		GetIVForNum(1, iv);
-		GetIVForNum(0x7FFFFFFE, FileIv);
 		std::vector<uint8_t> result = EAdata;
 		size_t dataSize = result.size();
 
 		DecryptBlock(result.data(), 16, key, iv);//解密开头元数据块
-
 		uint32_t PathSize = GetU8VecDW(result, 8);
 		if (PathSize > dataSize) throw DataPathSizeOutOfBoundsException(16);
 
@@ -102,10 +100,8 @@ namespace ndata {
 		uint32_t PathSize = GetU8VecDW(decryptData, 8);
 		AvxKey key;
 		AvxIv iv;
-		AvxIv FileIv;
 		GetIVForNum(0, key);
 		GetIVForNum(1, iv);
-		GetIVForNum(0x7FFFFFFE, FileIv);
 		DecryptBlock(decryptData.data(), 16, key, iv);//加密元数据块
 		int32_t FileCount = 0;
 		for (size_t i = 16; i + 12 < PathSize; i += 12) {//第一个四字节是位置关系，第二个四字节是大小关系，第三个四字节是文件目录字符串的长度

@@ -29,5 +29,6 @@ namespace ndata {
 		std::vector<uint8_t> DecryptData(const std::vector<uint8_t>& data);//解密函数，由这个解密完成后丢给DataWak的构造函数完成类构造
 		void GetIVForNum(uint32_t index, uint8_t iv[16]) const;
 		bool beta;
+		static const uint8_t FileIv[16];
 	};
 }
